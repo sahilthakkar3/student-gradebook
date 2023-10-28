@@ -1,0 +1,104 @@
+// Sahil Thakkar : 16014022088
+// Soham Sohoni :  16014022081
+// Title: Student Gradebook
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+struct StudentData {
+    char studentName[50];
+    char department[50];
+    char subject[50];
+    double marks;
+    char grade[3];
+    struct StudentData* next;
+};
+
+
+struct StudentData* hashtable[100] = {NULL};
+
+
+void calculateGrade(double marks, char grade[]) {
+    if (marks >= 90) {
+        strcpy(grade, "A+");
+    } else if (marks >= 80) {
+        strcpy(grade, "A");
+    } else if (marks >= 70) {
+        strcpy(grade, "B");
+    } else if (marks >= 60) {
+        strcpy(grade, "C");
+    } else if (marks >= 50) {
+        strcpy(grade, "D");
+    } else {
+        strcpy(grade, "F");
+    }
+}
+
+
+void insertStudent(struct StudentData* student) {
+    int hash = (int)(student->marks) % 100;
+    student->next = hashtable[hash];
+    hashtable[hash] = student;
+}
+
+int main() {
+    struct StudentData* studentResults[100];
+    int numStudents = 0;
+
+    while (1) {
+        struct StudentData* newStudent = (struct StudentData*)malloc(sizeof(struct StudentData));
+
+        printf("Enter student name (or type 'exit' to quit): ");
+        scanf("%s", newStudent->studentName);
+
+        if (strcmp(newStudent->studentName, "exit") == 0) {
+            free(newStudent);
+            break;
+        }
+
+        printf("Enter department: ");
+        scanf("%s", newStudent->department);
+
+        printf("Enter subject: ");
+        scanf("%s", newStudent->subject);
+
+        printf("Enter marks: ");
+        scanf("%lf", &newStudent->marks);
+
+        calculateGrade(newStudent->marks, newStudent->grade);
+
+       
+        insertStudent(newStudent);
+
+       
+        studentResults[numStudents] = newStudent;
+        numStudents++;
+    }
+
+    printf("\nStudent Grade Results:\n");
+
+    for (int i = 0; i < numStudents; i++) {
+        printf("Student Name: %s\n", studentResults[i]->studentName);
+        printf("Department: %s\n", studentResults[i]->department);
+        printf("Subject: %s\n", studentResults[i]->subject);
+        printf("Marks: %.2lf\n", studentResults[i]->marks);
+        printf("Grade: %s\n\n", studentResults[i]->grade);
+    }
+
+   
+    for (int i = 0; i < numStudents; i++) {
+        free(studentResults[i]);
+    }
+
+    for (int i = 0; i < 100; i++) {
+        struct StudentData* current = hashtable[i];
+        while (current != NULL) {
+            struct StudentData* temp = current;
+            current = current->next;
+            free(temp);
+        }
+    }
+
+    return 0;
+  }
